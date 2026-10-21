@@ -9,7 +9,7 @@ public class RouteSheet
     {
         ArgumentNullException.ThrowIfNull(stages);
 
-        Stages = stages.ToArray();
+        Stages = [..stages];
     }
 
     public IReadOnlyCollection<IRouteStage> Stages { get; }

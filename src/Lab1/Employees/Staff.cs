@@ -8,7 +8,8 @@ public class Staff
     {
         ArgumentNullException.ThrowIfNull(employees);
 
-        Employees = employees.ToArray();
+        // collection literal
+        Employees = [..employees];
     }
 
     public IReadOnlyCollection<Employee> Employees { get; }
@@ -34,6 +35,8 @@ public class Staff
             return new StaffWorkResult.Unmanageable(unmanageable);
         }
 
+        // LINQ
+        //
         TimeSpan duration = DistributeWork(items)
             .Select(shiftTime)
             .DefaultIfEmpty(TimeSpan.Zero)
@@ -47,12 +50,45 @@ public class Staff
         EmployeeShift[] shifts = Employees.Select(employee => new EmployeeShift(employee)).ToArray();
         SkuSet remaining = items;
 
+        TimeSpan currentTime = TimeSpan.Zero;
+
+        // [0, 1, ..., shifts.Length - 1]
+        // FIFO - first in - first out
+        // Employees hanging out next to the truck
+        Queue<int> freeEmployees = new Queue<int>([..Enumerable.Range(0, shifts.Length)]);
+
+        // Employees who went to the warehouse to put/take the goods and their return times.
+        PriorityQueue<int, TimeSpan> returnTimes = new PriorityQueue<int, TimeSpan>();
+
         while (!remaining.IsEmpty)
         {
-            foreach (EmployeeShift shift in shifts)
+            TimeSpan returningTime = currentTime;
+            while (returnTimes.TryPeek(out var returningEmployeeIndex, out returningTime) && returningTime <= currentTime)
             {
-                remaining = shift.MakeTrip(remaining);
+                _ = returnTimes.Dequeue();
+                freeEmployees.Enqueue(returningEmployeeIndex);
             }
+
+            if (freeEmployees.Any())
+            {
+                int employeeIndex = freeEmployees.Dequeue();
+                EmployeeShift shift = shifts[employeeIndex];
+                Employee employee = shift.Employee;
+                remaining = shift.MakeTrip(remaining);
+                currentTime += employee.HandlingTime;
+                returnTimes.Enqueue(employeeIndex, currentTime + shift.Employee.CarryingTime);
+            }
+            else
+            {
+                currentTime = returningTime;
+            }
+            // All goods are distributed across employees "in-advance"
+            // Instead, model step-by-step process where the next employee to load/unload is the first
+            // one who is next to the car.
+            // foreach (EmployeeShift shift in shifts)
+            // {
+            //     remaining = shift.MakeTrip(remaining);
+            // }
         }
 
         return shifts;

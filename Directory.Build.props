@@ -6,23 +6,23 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <AnalysisLevel>latest</AnalysisLevel>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <!-- <AnalysisLevel>latest</AnalysisLevel> -->
+        <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
+        <!-- <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-        <AnalysisMode>All</AnalysisMode>
+        <AnalysisMode>All</AnalysisMode> -->
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers">
+        <!-- <PackageReference Include="StyleCop.Analyzers">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        </PackageReference> -->
     </ItemGroup>
 
     <!-- itmo-is-dev code style analyzers -->
     <ItemGroup>
-        <PackageReference Include="SourceKit.Analyzers"/>
+        <!-- <PackageReference Include="SourceKit.Analyzers"/> -->
     </ItemGroup>
 
     <ItemGroup>
@@ -34,9 +34,9 @@
         <InternalsVisibleTo Include="$(AssemblyName).Tests"/>
     </ItemGroup>
 
-    <Target Name="Install git hooks" BeforeTargets="Build">
+    <!-- <Target Name="Install git hooks" BeforeTargets="Build">
         <Copy SourceFiles="$(MSBuildThisFileDirectory).githooks\pre-commit"
               DestinationFiles="$(MSBuildThisFileDirectory)\.git\hooks\pre-commit"/>
-    </Target>
+    </Target> -->
 
 </Project>

@@ -2,24 +2,24 @@ using Itmo.ObjectOrientedProgramming.Lab1.Characteristics;
 
 namespace Itmo.ObjectOrientedProgramming.Lab1.Skus;
 
-public class SkuSet
+public record class SkuSet
 {
     public SkuSet(IReadOnlyCollection<SkuBatch> batches)
     {
         ArgumentNullException.ThrowIfNull(batches);
 
-        Batches = batches
+        Batches = [.. batches
             .GroupBy(batch => batch.Sku.Id)
             .Select(sameSku => new SkuBatch(
                 sameSku.First().Sku,
-                new Quantity(sameSku.Sum(batch => batch.Quantity.Value))))
-            .ToArray();
+                new Quantity(sameSku.Sum(batch => batch.Quantity.Value))))];
 
         IsEmpty = Batches.Count == 0;
 
-        TotalMeasurements = new Measurements(
-            new Weight(Batches.Sum(batch => batch.TotalMeasurements.Weight.Kilograms)),
-            new Volume(Batches.Sum(batch => batch.TotalMeasurements.Volume.CubicMeters)));
+        TotalMeasurements = Batches.Aggregate(
+            new Measurements(),
+            (acc, batch) => acc + batch.TotalMeasurements
+        );
     }
 
     public IReadOnlyCollection<SkuBatch> Batches { get; }
@@ -55,12 +55,11 @@ public class SkuSet
     {
         ArgumentNullException.ThrowIfNull(other);
 
-        SkuBatch[] remaining = Batches
+        SkuBatch[] remaining = [.. Batches
             .Where(batch => batch.Quantity.Value > other.CountOf(batch.Sku))
             .Select(batch => new SkuBatch(
                 batch.Sku,
-                new Quantity(batch.Quantity.Value - other.CountOf(batch.Sku))))
-            .ToArray();
+                new Quantity(batch.Quantity.Value - other.CountOf(batch.Sku))))];
 
         return new SkuSet(remaining);
     }

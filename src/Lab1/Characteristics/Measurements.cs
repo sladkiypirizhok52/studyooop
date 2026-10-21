@@ -1,5 +1,6 @@
 namespace Itmo.ObjectOrientedProgramming.Lab1.Characteristics;
 
+// VolumeWeightCharacteristics
 public readonly record struct Measurements
 {
     public Measurements(Weight weight, Volume volume)
